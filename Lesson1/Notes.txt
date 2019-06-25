@@ -1,0 +1,38 @@
+Intro to Machine Learning Notes
+- definition: teaching computers to perform tasks from past experiences
+- 3 projects for this course
+    a) Find Donors for CharityML with Kaggle
+        1) Use population data to figure out what groups of people are most likely to donate
+    b) Create an Image Classifier (Deep Learning)
+        1) Use PyTorch to develop a NN for classifying images
+    c) Creating Customer Segments with Arvato (Unsupervised Learning)
+        1) Use demographic data to cluster potential clients for a variety of companies
+
+Intro - setting up environment (python3):
+1) Package manager is Anaconda
+2) Using Git Bash on Windows (bash emulation for windows command line):
+    a) cd into home directory
+        i) uninstall and install Git on windows
+        ii) make sure git and optional unix tools are checked
+    b) pwd to get home directory
+    c) anaconda path -> ~/Anaconda3
+    d) echo 'export PATH="$PATH:/home/sean/Anaconda3:/home/sean/Anaconda3/Scripts"' >> .bashrc
+        i) adds paths to env so Git has access
+    e) echo 'alias python="winpty python.exe"' >> .bashrc
+        i) required for users of Git Bash
+    f) source .bashrc
+    g) test everything to make sure it works
+        i) conda --version
+        ii) python --version
+3) Anaconda is cool because it can install non-python packges (unlike pip)
+    - download and install anaconda https://www.anaconda.com/download/
+        a) $ conda list > lists all packages installed by anaconda
+        b) open Anaconda Prompt application
+        c) $ conda upgrade conda; $ conda upgrade --all, answer yes
+        d) To install packages:  $ conda install numpy scipy pandas
+- jupyter notebooks
+
+--
+Sean Black
+skblackx2@gmail.com; sean.kendall.black@gmail.com
+(973)-270-3943 (Cell)
