@@ -1,1 +1,92 @@
-Pseudocode for 
+Steps for creating and testing a two-layer NN model:
+1) Load data
+2) One-hot encode categorical features
+3) scale the numerical data (fits between 0-1)
+4) split data into training and testing sets
+5) define the following functions:
+    a) sigmoid function
+        i) 1/(1+e^-x) -> 1/(1+np.exp(-x))
+    b) sigmoid prime function (derivative)
+        i) sigmoid(x) * (1-sigmoid(x))
+    c) error formula
+        i) -y * np.log(output) - (1 - y) * np.log(1-output)
+    d) error term
+        i) (y-output) * sigmoid_prime(x)
+    e) train_function
+        i) loop through epochs
+            - initialize weight changes (del_w = np.zeros(weights.shape))
+            - loop through records
+                i) output = sigmoid(np.dot(x,weights))
+                ii) error = error_formula(y,output)
+                iii) error_term = error_term_formula(x,y,output)
+                iv) del_w += error_term * x
+            - apply changes to weights
+                i) weights += learnrate * del_w / n_records
+        ii) return weights
+    f) weights = train_function(features, targets, epochs, learnrate)
+    g) calculate the accuracy:
+        i) output = sigmoid(np.dot(features_test,weights))
+        ii) predictions = test_output > 0.5 # this means activated nodes
+        iii) accuracy = np.mean(predictions == targets_test)
+
+Implementing Gradient Descent:
+1) define sigmoid and sigmoid prime functions
+2) get output -> sigmoid(np.dot(x,weights))
+3) error -> (y-output)
+4) gradient -> sigmoid_prime(output)
+5) error term -> error * gradient
+6) apply to weights -> del_w = learnrate * error_term * x
+
+*** Multilayer NN ***
+Params:
+- X         # raw input for first layer
+- weights_1 # weights for first layer
+- weights_2 # weights for second layer
+
+Forward Pass:
+1) calculate input to hidden layer
+    i) input_1 = X * weights_1
+2) calculate hidden layer output
+    i) output_1 = sigmoid(input_1)
+3) calculate input to output layer
+    i) input_2 = output_1 * weights_2
+4) calculate output of the network
+    i) output_final = sigmoid(input_2)
+
+Backpropagation:
+- The formula for calculating the change in weights for a layer is product of:
+    - learning rate
+    - error_term for that layer's output
+        - weights of prev layer * prev layer's error term * sigmoid_prime(prev layer's raw input)
+        - if no prev layer (current layer is final output aka first step):
+            - total error * sigmoid_prime(final output)
+    - layer's input
+# using the values from the forward pass algo above:
+1) calculate error term of final output
+    i) error = y-output_final
+    ii) output_error_term = error * sigmoid_prime(output_final)
+2) calculate error term of hidden layer
+    i) hidden_error_term = weights_hidden_to_output * output_error_term * sigmoid_prime(output_1)
+3) calculate del_w for output layer
+    i) del_w_o = output_error_term * output_1
+4) calculate del_w for hidden layer
+    i) del_w_h = hidden_error_term * X
+5) for every epoch, update weights:
+    i) weights_hidden_layer += del_w_h * learnrate / n_records
+    ii) weights_output_layer += del_w_o * learnrate / n_records
+
+* NOTE - Whenever there is a choice between simple model and a slightly better but much more complicated model, typically defer to simple model
+* NOTE - NN architecture is very difficult to get right, almost always end up under/overfitting
+    - Approach -> lean towards overfitting, optimize from there
+* NOTE - Use a model complexity graph to plot training vs testing results
+    - Approach -> use model with highest convergence and lowest error
+* NOTE - Punish large weights (coefficients) to reduce overfitting
+    - sum of abs or sum of squares (L1 and L2 regularization respectively)
+    - lambda * (sum weights)
+    - L1 is good for feature selection
+    - L2 is good for training models
+* NOTE - Concept of dropout, inactivate random nodes to improve training of the rest of them
+* NOTE - use the concept of momentum to overcome problems with local minima
+    - Takes a constant between 0 and 1, raises it to the power of how far back a step is
+        - previous step is B, the next previous is B^2, etc...
+    - takes average of all these values and applies it to the current step
