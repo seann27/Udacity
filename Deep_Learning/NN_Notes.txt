@@ -90,3 +90,134 @@ Backpropagation:
     - Takes a constant between 0 and 1, raises it to the power of how far back a step is
         - previous step is B, the next previous is B^2, etc...
     - takes average of all these values and applies it to the current step
+
+Creating a neural network with PyTorch:
+1) imports needed:
+    import torch (base)
+    from torch import nn (modeling)
+    from torch import optim (training the model)
+    import torch.nn.functional as F
+2a) build model using nn.Sequential()
+    a) use ReLU() activation functions for  hidden layers
+    b) use LogSoftmax for final activation
+        i) this is used in conjunction with a loss function (criterion)
+        ii) used when need to calculate multiple class probabilities
+            - e.g. 10 different output image labels
+2b) build model by creating your own class
+    a) class Classifier(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.hidden1 = nn.Linear(784,256)
+            self.hidden2 = nn.Linear(256,128)
+            self.hidden3 = nn.Linear(128,64)
+            self.output = nn.Linear(64,10)
+        def forward(self, x):
+            # flatten data
+            x = x.view(x.shape[0],-1)
+
+            # run pipeline
+            x = F.relu(self.hidden1(x))
+            x = F.relu(self.hidden2(x))
+            x = F.relu(self.hidden3(x))
+            x = F.log_softmax(self.output(x), dim=1)
+
+            return x
+
+3) define optimizer and loss functions (example):
+    a) optimizer = optim.SGD(model.parameters(), lr=0.005)
+    b) criterion = nn.NLLLoss()
+4) train the model
+    a) loop over epochs
+    b) loop over inputs/labels
+        i) convert to 2D tensor (make sure same size as NN input layer)
+        ii) clear optimizer
+            - optimizer.zero_grad()
+        iii) forward pass
+            - model.forward(input)
+        iv) calculate loss
+            - criterion(output,labels)
+        v) perform Backpropagation
+            - loss.backward()
+        vi) adjust the weights
+            - optimizer.step()
+
+Implementing dropout to reduce overfitting
+1) by modifying the existing model class:
+    a) class Classifier(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.hidden1 = nn.Linear(784,256)
+            self.hidden2 = nn.Linear(256,128)
+            self.hidden3 = nn.Linear(128,64)
+            self.output = nn.Linear(64,10)
+
+            self.dropout = nn.Dropout(p=0.2)
+
+        def forward(self, x):
+            # flatten data
+            x = x.view(x.shape[0],-1)
+
+            # run pipeline w/ dropout
+            x = self.dropout(F.relu(self.hidden1(x)))
+            x = self.dropout(F.relu(self.hidden2(x)))
+            x = self.dropout(F.relu(self.hidden3(x)))
+
+            # output -> no dropout here
+            x = F.log_softmax(self.output(x), dim=1)
+
+            return x
+2) can toggle dropout off/on with model.eval() and model.train() respectively
+
+Saving/Loading models (fc.model is a custom module created by instructor):
+1) Save:
+    a) save the model architecture along with the state_dict in variable
+        - checkpoint = {  'input': 784,
+                          'output': 10,
+                          'hidden_layers': [each.out_features for each in model.hidden_layers],
+                          'state_dict': model.state_dict()}
+                       }
+    b) torch.save(checkpoint, 'checkpoint.pth')
+2) Load:
+    a) As a function (will need to be tailored/changed for every model built):
+        def load_checkpoint(filepath):
+            checkpoint = torch.load('checkpoint.pth')
+            model = fc.model.Network(checkpoint['input_size'],
+                                     checkpoint['output_size'],
+                                     checkpoint['hidden_layers'])
+            model.load_state_dict(checkpoint['state_dict'])
+
+            return model
+
+Loading real world image data
+1) imports needed:
+    - import torch
+    - from torchvision import datasets, transform
+2) Load dataset from image folder
+    a) dataset = datasets.ImageFolder('path/to/data', transform=transform)
+    b) expects the following formatted files:
+        root/dog/xzy.png
+        root/cat/fdsfd.png
+3) transform your data
+    a) use a compose pipeline with different transforms
+        i) transform = transforms.Compose([ transforms.Resize(255),
+                                            transforms.CenterCrop(224),
+                                            transforms.ToTensor() ])
+
+Transfer Learning -> using pre-trained models to classify images
+https://pytorch.org/docs/0.3.0/torchvision/models.html
+1) make sure your dataset of images has the correct configuration for the models
+    a) transform with 224x224 and normalize with the means/std
+    b) transforms.Normalize([0.485, 0.456, 0.406],[0.229, 0.224, 0.225])
+2) choose a model
+    a) model = models.densenet121(pretrained=True)
+3) freeze the parameters so the model's features aren't retrained and set classifier
+    a) for param in model.parameters();
+        param.requires_grad = False
+    b) from collection import OrderedDict
+    c) classifier = nn.Sequential(OrderedDict([
+                              ('fc1', nn.Linear(1024, 500)),
+                              ('relu', nn.ReLU()),
+                              ('fc2', nn.Linear(500, 2)),
+                              ('output', nn.LogSoftmax(dim=1))
+                          ]))
+    d) model.classifier = classifier
