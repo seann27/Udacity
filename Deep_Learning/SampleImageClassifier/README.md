@@ -1,0 +1,5 @@
+- Recreates the image classifier from the udacity course, but using this computer's GPU
+- This machine currently runs on NVIDIA GTX 1070 with 16GB RAM
+- This machine also has a duel Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz processor
+- Downloaded the Cats vs Dogs dataset from Kaggle
+- https://www.kaggle.com/chetankv/dogs-cats-images
