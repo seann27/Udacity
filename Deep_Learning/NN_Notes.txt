@@ -221,3 +221,15 @@ https://pytorch.org/docs/0.3.0/torchvision/models.html
                               ('output', nn.LogSoftmax(dim=1))
                           ]))
     d) model.classifier = classifier
+
+Graphing results:
+# change this to the trainloader or testloader
+data_iter = iter(testloader)
+
+images, labels = next(data_iter)
+fig, axes = plt.subplots(figsize=(10,4), ncols=4)
+for ii in range(4):
+    ax = axes[ii]
+    helper.imshow(images[ii], ax=ax, normalize=False)
+
+image, label = next(iter(trainloader))
