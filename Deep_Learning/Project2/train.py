@@ -8,9 +8,10 @@ from torchvision import datasets, transforms
 import pretrained_models
 import time
 import numpy as np
+from PIL import Image
 import argparse
-import json
 import os
+from CustomClassifiers import Classifier
 
 # Load default options
 save_dir = '.'
@@ -27,8 +28,9 @@ parser.add_argument('--save_dir', help='Directory where model checkpoint is save
 parser.add_argument('--filename', help='Name of checkpoint file')
 parser.add_argument('--arch', help='Model to be used from torchvision')
 parser.add_argument('--learning_rate', help='Learning rate for training classifier')
-parser.add_argument('--hidden_units', help='Hidden units used for training classifier')
-parser.add_argument('--epoch', help='Number of training iterations')
+parser.add_argument('--hidden_units', metavar='N', type=int, nargs='+',
+                    help='Hidden units used for training classifier')
+parser.add_argument('--epochs', help='Number of training iterations')
 args = parser.parse_args()
 
 if args.save_dir:
@@ -36,14 +38,15 @@ if args.save_dir:
 if args.arch:
     filename = save_dir+'/'+args.arch+'_checkpoint.pth'
     model = pretrained_models.getPretrainedModel(args.arch)
+    arch = args.arch
 if args.filename:
     filename = save_dir+'/'+filename
 if args.learning_rate:
     learning_rate = args.learning_rate
 if args.hidden_units:
     hidden_units = args.hidden_units
-if args.epoch:
-    epochs = args.epoch
+if args.epochs:
+    epochs = int(args.epochs)
 
 print('directory: ',save_dir)
 print('model: ',arch)
@@ -84,10 +87,6 @@ trainloader = torch.utils.data.DataLoader(train_data, batch_size=32, shuffle=Tru
 validloader = torch.utils.data.DataLoader(valid_data, batch_size=32, shuffle=True)
 testloader = torch.utils.data.DataLoader(test_data, batch_size=32)
 
-# Define mapping for flower names
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
-
 # Configure device (cpu or gpu)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Training model on {} ...".format(device))
@@ -110,16 +109,10 @@ if hidden_units is None:
                                nn.Linear(306, 102),
                                nn.LogSoftmax(dim=1))
 else:
-    classifier = nn.Sequential(nn.Linear(25088, hidden_units),
-                               nn.ReLU(),
-                               nn.Dropout(p=0.2),
-                               nn.Linear(hidden_units, 306),
-                               nn.ReLU(),
-                               nn.Dropout(p=0.2),
-                               nn.Linear(306, 102),
-                               nn.LogSoftmax(dim=1))
+    classifier = Classifier(hidden_units)
 
 model.classifier = classifier
+print(model.classifier)
 
 # Define loss function and optimizer for backpropagation
 criterion = nn.NLLLoss()
@@ -221,9 +214,10 @@ with torch.no_grad():
 # Save model checkpoint
 model.class_to_idx = train_data.class_to_idx
 imgCls_checkpoint = {'class_to_idx': model.class_to_idx,
-              'classifier':model.classifier,
+              'classifier_state':model.classifier.state_dict(),
               'state_dict': model.state_dict(),
               'arch': arch,
+              'hidden_units':hidden_units,
               'epochs':epochs,
               'criterion':criterion,
               'optimizer_state': optimizer.state_dict() }

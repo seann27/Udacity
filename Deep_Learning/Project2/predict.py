@@ -12,6 +12,11 @@ import numpy as np
 from PIL import Image
 import argparse
 import json
+from CustomClassifiers import Classifier
+
+# Define mapping for flower names
+with open('cat_to_name.json', 'r') as f:
+    cat_to_name = json.load(f)
 
 # Function that loads a checkpoint and rebuilds the model
 def load_checkpoint(file):
@@ -20,10 +25,13 @@ def load_checkpoint(file):
     else:
         map_location='cpu'
     checkpoint = torch.load(file, map_location=map_location)
-
     model = pretrained_models.getPretrainedModel(checkpoint['arch'])
-    model.classifier = checkpoint['classifier']
+    hidden_units = checkpoint['hidden_units']
+    if hidden_units:
+        model.classifier = Classifier(hidden_units)
+    model.classifier.load_state_dict(checkpoint['classifier_state'])
     model.load_state_dict(checkpoint['state_dict'])
+    model.class_to_idx = checkpoint['class_to_idx']
 
     return model
 
@@ -31,7 +39,7 @@ def process_image(image):
     ''' Scales, crops, and normalizes a PIL image for a PyTorch model,
         returns an Numpy array
     '''
-    image = image.resize((256,256),resample=0)
+    image = image.resize((256,256))
     top = (256-224)/2
     left = (256-224)/2
     bottom = (256+224)/2
@@ -55,16 +63,17 @@ if image_path is None:
     exit()
 
 # set default
-topk = 1
+topk = 5
 if args.topk:
-    topk = args.topk
+    topk = int(args.topk)
 
 filename = 'vgg19_checkpoint.pth'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print("Current device: ",device)
 model = load_checkpoint(filename)
 model.to(device)
 
-with torch.no_grad():
+def predict(image_path, model, topk=5):
     image = Image.open(image_path)
     np_image = process_image(image)
     np_tensor = torch.from_numpy(np_image)
@@ -74,7 +83,20 @@ with torch.no_grad():
     log_ps = model.forward(np_tensor)
     ps = torch.exp(log_ps)
     top_p,top_class = ps.topk(topk,dim=1)
+    return top_p,top_class
+
+with torch.no_grad():
+    top_p,top_class = predict(image_path,model,topk)
+    top_p = top_p.cpu()
+    top_class = top_class.cpu()
     top_p = top_p.numpy().reshape(-1)
     top_class = top_class.numpy().reshape(-1)
+    print(top_p)
+    print(top_class)
+
+    # invert the flower name mappings
+    inverted_dict = dict([[v,k] for k,v in model.class_to_idx.items()])
+
     for p, name in zip(top_p,top_class):
-        print(p,': ',cat_to_name[str(name)])
+        idx = inverted_dict[int(name)]
+        print(cat_to_name[str(idx)],': ',p)
