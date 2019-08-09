@@ -13,10 +13,7 @@ from PIL import Image
 import argparse
 import json
 from CustomClassifiers import Classifier
-
-# Define mapping for flower names
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
+import os.path
 
 # Function that loads a checkpoint and rebuilds the model
 def load_checkpoint(file):
@@ -39,11 +36,14 @@ def process_image(image):
     ''' Scales, crops, and normalizes a PIL image for a PyTorch model,
         returns an Numpy array
     '''
-    image = image.resize((256,256))
-    top = (256-224)/2
-    left = (256-224)/2
-    bottom = (256+224)/2
-    right = (256+224)/2
+    if image.size[0] > image.size[1]:
+        image.thumbnail((1000000,256))
+    else:
+        image.thumbnail((256,1000000))
+    top = (image.height-224)/2
+    left = (image.width-224)/2
+    bottom = (image.height+224)/2
+    right = (image.width+224)/2
     image = image.crop((left,top,right,bottom))
     np_image = np.array(image)/255
     mean = np.array([0.485, 0.456, 0.406])
@@ -55,12 +55,23 @@ def process_image(image):
 parser = argparse.ArgumentParser(description="Load model and hyperparameters")
 parser.add_argument('--image', help='Filepath of image')
 parser.add_argument('--topk', help='Number of top predictions to display')
+parser.add_argument('--json', help='File to map classes to labels')
 args = parser.parse_args()
 
 image_path = args.image
 if image_path is None:
     print("Error! No image path specified!")
     exit()
+
+# Define mapping for flower names
+jsonfile = 'cat_to_name.json'
+if args.json:
+    if os.path.exists(args.json):
+        jsonfile = args.json
+    else:
+        print("Error, json file not found. Using default \'cat_to_name.json\' . . .")
+with open(jsonfile, 'r') as f:
+    cat_to_name = json.load(f)
 
 # set default
 topk = 5
