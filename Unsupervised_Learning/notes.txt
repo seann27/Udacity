@@ -1,0 +1,28 @@
+Introduction:
+- Understanding grouping with unlabeled data
+    - figure out what regions of data share similarity with one another
+- Used for grouping data (can narrow down or discover important features)
+
+Topics:
+1) Clustering
+2) Hierarchical and Density Based Clustering
+3) Gaussian Mixture Models and Cluster Validation
+4) Principal Component Analysis
+5) Random Projection and Independent Component Analysis
+
+Clustering:
+- K-means algorithm
+    - how many clusters you want the data to separate into
+    - how to choose k?
+        - if you know categories, can use that as estimate
+        - otherwise can use a decision method
+    - elbow method
+        - increasing k until the impact is substantially low (avg distance between clusters doesn't change much)
+        - use a scree plot to determine the exact falloff
+    - Steps:
+        1) centroids placed randomly
+        2) points are assigned a centroid based on proximity
+        3) centroids are moved to the center of the points assigned
+    - The first step matters and can yield different results
+    - The algorithm is performed many times with different random placement of 1st step centroids
+    - The final clustering that yields the smallest avg. distance wins
