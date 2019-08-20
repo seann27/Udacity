@@ -26,3 +26,37 @@ Clustering:
     - The first step matters and can yield different results
     - The algorithm is performed many times with different random placement of 1st step centroids
     - The final clustering that yields the smallest avg. distance wins
+- Hierarchical clusterings
+    - all techniques are a part of agglomerative clustering in sklearn
+    - starts from the bottom up, assuming each point is a cluster
+        - first iteration, merges nearest 2 clusters
+    - measures distance by farthest possible link between clusters
+    - can also do it by average between all points between a set of clusters
+    - ward's method -> find central point between clusters and square the sum of distances between all points
+      in each cluster to the central point
+      - subtract the variance (distance from points to central point of an individual cluster)
+    - in sklearn, import cluster
+        - use agglomerative clustering
+        - specify number of clusters and linkage method
+    - use scipy for drawing dendrograms
+    - hierarchical representations are very informative
+        - potent when data reflects hierarchical relationships (evolution in biology)
+        - con -> sensitive to noise and outliers
+        - con -> computationally intense
+    - DBSCAN (Density Based Spatial Clustering of Applications with Noise)
+        - groups together points that are compactly grouped together
+        - good at detecting outliers and noise
+- Gaussian Mixture Model Clustering
+    - Every point belongs to every cluster with different levels of membership
+    - uses probabilities and statistics to come up with distributions of point memberships between clusters
+    - based off of normal distributions (uniformly distributed histograms for example)
+        - bell curves
+        - mean/average
+        - standard deviation
+        - mean + or- (i*std) used to scale the distribution where i=1,2,3...n
+    - multivariate gaussian distribution used to handle multiple dimensions and variables
+    1) initialize k gaussian distributions
+    2) soft cluster data - "Expectation step"
+    3) re-estimate the gaussians = "maximization step"
+    4) evaluate the log-likelihood to check for convergence
+    5) repeat from step 2 until converged
