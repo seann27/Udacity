@@ -55,8 +55,51 @@ Clustering:
         - standard deviation
         - mean + or- (i*std) used to scale the distribution where i=1,2,3...n
     - multivariate gaussian distribution used to handle multiple dimensions and variables
+    - pros -> soft-clustering (sample membership of multiple clusters)
+    - pros -> cluster shape flexibility
+    - cons -> sensitive to init values
+    - cons -> local optimum
+    - cons -> slow convergence rate
+- Gaussian implementation:
     1) initialize k gaussian distributions
+        - give each k distribution a mean and std
+        - better way to do it is to run kmeans to get these metrics
     2) soft cluster data - "Expectation step"
-    3) re-estimate the gaussians = "maximization step"
+        - calculate the membership of each point to each cluster based on the features
+        - use formula (probability density function of a normal distribution)
+    3) re-estimate the gaussians - "maximization step"
+        - calculate the weighted average of all the points in a particular cluster
+            - uses features and membership percentage
+        - calculate weighted variance
     4) evaluate the log-likelihood to check for convergence
+        - the higher this value, the more confident we are that the model is correct
+        - can tweak parameters for better optimization (in the initialization step)
+        - change the covariance type
     5) repeat from step 2 until converged
+- Cluster Analysis:
+    1) feature selection/extraction
+    2) choose a clustering algorithm/selection tuning
+        - proximity measure (calculate distance between points)
+    3) cluster validation
+        - number of scoring methods to evaluate the quality of the structure
+    4) results interpretation
+        - what insights we can learn from the clusters
+- Cluster validation
+    - cluster validation indices
+        - external indices (predetermined labels)
+        - internal indices (measure fit between data and structure using only the data)
+        - relative indices
+    - adjusted rand index (scoring example) for external indices
+        - between -1 and 1
+        - compares using labels (grand truth) to how the data was cluster
+    - internal indices scoring example -> silhouette coefficient
+        - between -1 and 1
+        - there is a silh. coeff. for every point in the dataset that can be calculated
+            - compares distances of points in same clusters, other neighboring clusters. and other clusters
+            - average all of them for the final coefficient for the result
+            - used to find what k is
+        - can also use to compare how different algorithms performed on same dataset
+            - doesn't measure well with dbscan
+        - not always good at measuring
+        - always looking for compact and dense clusters (poor performance for the 'rings' dataset)
+        - should use something like dbsv (density based cluster validation) for DBSCAN algorithm
