@@ -103,3 +103,43 @@ Clustering:
         - not always good at measuring
         - always looking for compact and dense clusters (poor performance for the 'rings' dataset)
         - should use something like dbsv (density based cluster validation) for DBSCAN algorithm
+
+Principal Component Analysis:
+- Transforming data rather than clustering it
+- Allows you to retain informative parts of the data but with less of it
+- Used for condensing the dataset
+- Feature selection and feature extraction are useful for filtering out unimportant features
+- Interpreting results:
+    - principal components
+    - variability of the original data
+- reduce features into groupings called latent features
+- Feature Selection:
+    - finding a subset of the original features that are determined to be most important
+    - filter methods
+    - wrapper methods
+- Feature Extraction:
+    - construct new features called "latent features"
+    - existing features are combined as "principal components"
+    - want components that capture the largest amount of variance in the dataset
+    - components must be orthogonal to each other
+- when to use PCA?
+    - to reduce dimensionality of the data
+    - find latent features that might encapsulate other features
+
+Random Projection:
+- computationally less expensive than PCA
+- multiplies dataset by a random matrix
+- Johnson-Lindenstrauss lemma
+    - dataset can be mapped down to much smaller dimensionality in a way where
+      distances between points are minimally effected
+- how are they preserved?
+    - (1-eps)*(u-v)^2 < projections < (1+eps)*(u-v)^2
+    - use epsilon as a hyperparameter to specify range of error in projections
+
+ICA (Independent Component Analysis):
+- isolate features that share different sources (Independent of one another)
+    - blind source separation
+- An audio track with 3 different instructments playing different songs
+    - pick out individual instruments/songs
+- Take an input matrix, multiple by an estimated unmixing matrix, see if output
+  matrices converge, repeat until complete source separation occurs
