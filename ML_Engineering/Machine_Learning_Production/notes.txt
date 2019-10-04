@@ -1,0 +1,23 @@
+*** Deployment using Cloud Computing with AWS ***
+
+Examining these questions:
+1) What's the machine learning workflow?
+2) How does deployment fit into the machine learning workflow?
+3) What is cloud computing?
+4) Why would we use cloud computing for deploying machine learning models?
+5) Why isn't deployment a part of many machine learning curriculums?
+6) What does it mean for a model to be deployed?
+7) What are the essential characteristics associated with the code of deployed models?
+8) What are different cloud computing platforms we might use to deploy our machine learning models?
+
+I) Machine Learning Workflow:
+    * Explore and Process Data
+        - retrieve
+        - clean and explore
+        - prepare and transform
+    * Modeling
+        - develop and train model
+        - validate/evaluate model
+    * deployment
+        - deploy to production
+        - monitor and update model and data

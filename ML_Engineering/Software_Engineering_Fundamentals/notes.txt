@@ -1,0 +1,122 @@
+Software Engineering Practices pt 1:
+- clean and modular code
+    - Code needs to be production grade
+    - Readable, simple, and concise
+    - Modularly broken up into modules and functions
+        - allows reuse -> no redundancy
+        - minimize number of entities
+        - functions should do 1 task
+            - avoid naming functions with "and"
+        - try not to use more than 3 arguments when possible
+    - Refactoring code -> basically means just editing/cleaing it up
+    * for booleans, prefix variables with is_
+    * single name variables like "x" or "i" are good for counters but that's it
+    * "arr" describes an arbitrary array as a parameter
+    - use whitespace properly
+    - limit lines to 79 characters
+- improve efficiency
+    - reducing the time and space complexity
+    - example involving checking one list for items from another list
+        - use vector operations over loops (numpy, pandas)
+        - common elements in 2 numpy arrays
+        - numpy.intersect1d method -> np.intersect1d(list,list2)
+        - use sets instead of lists -> set(list).intersect(set(list2))
+    - perform operations on list after filtering:
+        - e.g. -> amount = list[list<5].sum()*10
+- documentation
+    - line level -> inline comments
+    - function or module level -> docstrings
+    - project level -> README.md file
+- version control
+    - create branches for new features
+    - https://nvie.com/posts/a-successful-git-branching-model/
+    - https://help.github.com/en/articles/about-merge-conflicts
+    - https://blog.algorithmia.com/how-to-version-control-your-production-machine-learning-models
+
+Software Engineering Practices pt 2:
+- testing
+    - writing tests is a standard practice
+    - test driven development -> write tests before you write code
+    - unit tests -> write tests that cover small portions (like functions)
+    - for testing scripts, can use assert() to validate answers
+    - pytest is a good tool
+        - pip install -U pytest
+        - create a test file with test methods
+        - one assert statement per test
+        - prefix test files and test functions with "test_"
+- logging
+    - be clear and concise, make sure level is appropriate (DEBUG/ERROR/INFO)
+- code reviews
+    - https://www.kevinlondon.com/2015/05/05/code-review-best-practices.html
+    - https://github.com/lyst/MakingLyst/tree/master/code-reviews
+    - getting your code peer-reviewed
+    - use a code-linter -> pylint
+
+Object-Oriented Programming with python:
+- Build a python package from scratch
+- Procedural vs OOP
+    - basic coding without objects vs objects and their properties/methods
+- Classes
+- example:
+    class Object:
+        def __init__(self,attr1,attr2,attr3):
+            self.at1 = attr1
+            self.at2 = attr2
+            self.at3 = attr3
+
+        def method1(self,val):
+            self.val = val
+
+        def method2(self,val2):
+            return self.val * val2
+
+- using "self" tells the interpreter where in memory the specific object being
+  used is
+ - Modularize the class code into separate python scripts
+ - some drawbacks for changing attributes directly (object.attr = x) as opposed
+   to writing setter/getter methods
+   - gives more flexibility, for example, if calculations of attr change
+- an underscore in front of an attribute indicates that it should only be
+  accessed with get/set methods
+    - self._attr = x
+- docstrings:
+    - triple quotes
+    - make sure it is indented
+- magic methods def __magic__(self,other):
+                    do x, y, z
+  -> this replaces default python methods
+     - def __add__ would replace x + y
+- inheritance
+  class clothing:
+    def init()
+
+  class shirt(clothing)
+    def init()
+        clothing.__init__()
+- python packages -> creating a package and using pip install to locally download
+  - packages need an __init__.py file
+  - from .package import ...
+  - putting where to import things in the __init__.py file is like creating a shortcut
+  - example setup.py for installing package
+  - cd into directory with setup.py
+    -> pip install . or pip install --upgrade .
+
+- the @ symbol is called a decorator
+    -> @deprecated("text")
+
+- putting code on PyPi
+    -> upload to the test repo test.pypi.org
+    -> create accounts on both repos
+    -> cd to your dir with package files
+        -> need to add README.md, license.txt, setup.cfg -> put name of README file
+    -> python setup.py sdist
+        -> inside dist folder is a tarball you'll end up uploading
+    -> pip install twine
+    -> twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+    -> pip install --index-url https://test.pypi.org/simple/ package
+    * if everything works well and ready to upload to prod repo *
+    -> twine upload dist/*
+    -> reinstall package using prod
+        -> pip uninstall package (removes from test repo)
+        -> pip install package
+    * underscores get replaced with dashes once uploaded *
