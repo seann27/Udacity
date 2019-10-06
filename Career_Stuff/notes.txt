@@ -16,7 +16,7 @@
 	- can use pitch in the linkedin summary
 		- when conversing with new people, talk about points in this pitch through convo
 		- networking tool
-	* I am a data scientist who loves building analytical tools to help people understand their data more easily.
+	* I am a data scientist who loves building tools to help understand large amounts of information and data.
 	* I have developed tools and scripts to help facilitate analyzing the DNA sequencing data for our investigators.
 	* I love sports, and right now I am currently working on implementing machine learning to create analytical
 	 	tools for understanding trends in American Football
