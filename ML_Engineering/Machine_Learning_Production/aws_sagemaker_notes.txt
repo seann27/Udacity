@@ -1,0 +1,49 @@
+- Has ability to set up jupyter notebooks
+- Has built-in API for developing and training models
+- Has high and low level functionality
+    -> high level is for quick development
+        - use pre-built methods and params to train and deploy model
+    -> low level provides more customization
+        - allows programmer to be more specific and robust in setting up model
+
+## header
+import sagemaker
+from sagemaker import get_execution_role
+from sagemaker.amazon.amazon_estimator import get_image_uri
+
+session = sagemaker.Session()
+role = get_execution_role()
+
+## format for data
+-> typically CSV but can be others
+-> set up dataframe with labels in the first column
+-> make sure header=False, index=False in dataframe
+
+## upload to S3 bucket (where files are stored)
+location = session.upload_data('./test.csv',key_prefix='name_of_model')
+
+## low level
+container = get_image_uri(session.boto_region_name, 'xgboost')
+
+# specify params according to example workbooks (high/low level)
+
+- Can use the AWS sagemaker console to view training jobs and their logs
+    -> logs show output of job, useful for debugging errors
+
+- testing the model
+    -> create transformer object
+    -> use object to create batch transform job
+
+Summary:
+SageMaker model consists of 2 parts:
+1) container -> software/hardware specs
+2) model artifacts -> data about the model once it has been trainined
+
+- SageMaker pulls data stored on S3 for training and validation
+- After model parameters are set, the model is fit on this data
+- the fit model can then be used for inference
+
+### Deploying the Model ###
+- Consists of endpoint name and config
+- follow instructions in the notebooks
+- MAKE SURE YOU SHUT DOWN ENDPOINTS WHEN NOT IN USE TO AVOID GETTING CHARGED

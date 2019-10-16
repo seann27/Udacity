@@ -21,3 +21,48 @@ I) Machine Learning Workflow:
     * deployment
         - deploy to production
         - monitor and update model and data
+
+- endpoint of production environment is defined as the interface to the model
+    -> facilitates interaction between application and model
+    -> allows application to send user data to model
+    -> receives predictions based on input data
+
+- Endpoint and REST API (Application Programming Interface)
+    -> REST (Representational State Transfer)
+    -> uses HTTP requests and responses
+    -> HTTP Request:
+        - Endpoint in the form of a URL
+        - HTTP Method (GET, POST, PUT, DELETE)
+        - HTTP Headers (format of data)
+        - Message, Data, or Body (User's input data)
+    -> HTTP Response
+        - HTTP Status Code (if backend processing was successful or contained errors)
+        - HTTP Headers, Message/Data/Body
+    -> Data is typically transferred as ordered JSON or CSV formatted data
+        - requires code to transform and process as needed
+
+- Containers -> computing environment for application and model
+    -> Docker is a container, for example
+    -> analogy: shipping containers with different products and goods
+    -> components:
+        - underlying infrastructure (data center or local computer, cluster)
+        - operating system
+        - container engine (Docker software itself)
+        - libraries and binaries required to launch, run, and maintain backend/frontend
+
+- Characteristics of Deployment
+    -> model versioning: keeping track of model version metadata in database
+    -> model monitoring: once deployed, need to make sure it is living up to performance metrics
+    -> model updating and routing: ability to easily update the deployed model
+        - routing sends different proportions of user input to model variants for comparisons
+    -> model predictions: on-demand and batch
+        - on-demand: predictions send back to user in proper format (JSON/XML)
+            - provide real-time responses
+        - batch: high volume of requests, returns predictions to file
+            - aids in business decisions with large amounts of consumer data
+
+- Machine Learning Cloud Platforms
+    -> Amazon Web Services (AWS) SageMaker
+    -> Google ML Engine
+    - AWS has 15 built-in algorithms
+    - Automatic hyperparameter tuning
