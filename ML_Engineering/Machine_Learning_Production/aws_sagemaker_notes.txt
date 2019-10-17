@@ -47,3 +47,10 @@ SageMaker model consists of 2 parts:
 - Consists of endpoint name and config
 - follow instructions in the notebooks
 - MAKE SURE YOU SHUT DOWN ENDPOINTS WHEN NOT IN USE TO AVOID GETTING CHARGED
+
+### Tuning hyperparameters ###
+- To look up model training output, use Amazon CloudWatch to view the logs
+    -> useful for debugging
+    -> sagemaker console -> training jobs -> job we made -> view logs under monitor section
+- will be able to run data across multiple models and their hyp params
+    -> evaluate what model / set of params is optimal (similar to sklearn's gridsearch)
