@@ -43,6 +43,23 @@ SageMaker model consists of 2 parts:
 - After model parameters are set, the model is fit on this data
 - the fit model can then be used for inference
 
+Notebook structure:
+a) import modules
+b) connect to SageMaker
+c) get data
+d) split data into train, validation, and test sets
+e) upload to S3 storage
+f) train and construct xgboost model
+    -> specify container
+    -> use hyperparameter tuning API
+g) create and configure tuning job object (hyperparameters that are auto-tuned)
+h) run tuning job
+i) get the best model, use for batch transform on test data
+
+- for low level implementation
+    ->  training param dictionary object used to create the base model
+    -> same as using estimator object in the high level implementation
+
 ### Deploying the Model ###
 - Consists of endpoint name and config
 - follow instructions in the notebooks
@@ -54,3 +71,81 @@ SageMaker model consists of 2 parts:
     -> sagemaker console -> training jobs -> job we made -> view logs under monitor section
 - will be able to run data across multiple models and their hyp params
     -> evaluate what model / set of params is optimal (similar to sklearn's gridsearch)
+- for low level implementation, can specify static hyperparameters that won't change
+  when tuning
+  -> when naming tuning job, there is a constraint
+        - max length of job name is 32 characters
+- can view tuning jobs in sagemaker console
+- can view the "best training job" within the output of the job
+    -> contains the name of the model that performed the best
+    -> need this name to get training artifact for that model
+
+### Updating a Deployed Model ###
+- Allows user to update a deployed model's enpoint with a newer model without
+  interrupting the availability of the application/model
+workflow:
+1) import modules, load/split/upload data
+2) use high level functionality to train/fit a model
+    -> get the artifacts
+3) use low level to create a new model with the trained artifacts
+4) create endpoint
+5) convert test data into format readable by endpoint
+6) convert endpoint response to format readable by user
+7) decide to change from xgboost to linear
+8) use high level approach by creating artifacts w/ linear model
+    -> container
+    -> estimator
+    -> hyperparameters
+    -> train using "fit" method
+9) deploy model by creating a model object inside of sagemaker
+    -> model name (unique w/ timestamp)
+    -> primary sagemaker container w/ container and artifacts
+    -> construct the actual model in sagemaker
+        - session.sagemaker_client.create_model(
+            ModelName = linear_model_name,
+            ExecutionRoleArn = role,
+            PrimaryContainer = linear_primary_container
+        )
+10) create an endpoint configuration
+    -> config name
+    - session.sagemaker_client.create_endpoint_config(
+        EndpointConfigName = linear_endpoint_config_name,
+        ProductionVariants = [{
+            "InstanceType":"ml.m4.xlarge",
+            "InitialVariantWeight": 1,
+            "InitialInstanceCount": 1,
+            "ModelName": linear_model_name,
+            "VariantName": "Linear-Model"
+        }]
+    )
+11) deploy the endpoint
+12) use the model, when finished shut down the endpoint
+13) so now we have 2 models, a linear model and an xgboost model.
+    -> we can run an A/B test to tell the endpoint which model to use
+    -> endpoint receives a bunch of data and determines what model to send data to
+14) create new endpoint config with 2 models in the ProductionVariants property
+    -> divides the production variant's weight by the total weights of all variants
+       to determine what percentage of data to send to the model
+15) to update the endpoint to only point to the linear model, run sagemakers update endpoint method
+    -> takes configuration name as argument, can use this to point to linear model
+
+- use low level approach when deploying model to specify endpoint configurations
+    -> high level approach does this for you automatically
+
+To code a generator:
+    replace a return statement with a yield statement
+
+    def get_sample(in_X,in_XV,in_Y):
+        for idx, smp in enumerate(in_X):
+            res = round(float(predict(in_XV[idx])))
+            if res != in_Y[idx]:
+                yield smp, in_Y[idx]
+
+    gn = get_sample(new_X, new_XV, new_Y
+    print(next(gn))
+
+SageMaker tips and tricks:
+- use CloudWatch logs to diagnose training job issues
+- changes between models can be small, so copy and paste can be useful
+- documentation not always up to date (SageMaker updates frequently)
+- Python SDK -> documentation for high level approaches using Python with SageMaker
