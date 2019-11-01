@@ -1,0 +1,20 @@
+Credit card data taken from kaggle
+- use linear learner to detect fraud
+
+1) import resources
+2) load sagemaker resources (session, roles, s3 buckets)
+3) load data from online (creditcard.csv file)
+
+*) specify tuning and balancing hyperparameters when training to build a better
+tuned model
+
+- For a tuning a problem, need to determine if accuracy, precision, or recall is more
+  important
+- For balancing a dataset, if labels are drastically skewed towards one class,
+  consider applying a balancing weight hyperparameter to the model
+    -> in the credit card fraud example, only 0.1% of the training data was
+       labeled as fraudulent, makes it much harder to train
+
+- sagemaker fits in by automating implementing machine learning models
+    -> automating the infrastructure to make use of hardware with pre-built
+       algorithms
