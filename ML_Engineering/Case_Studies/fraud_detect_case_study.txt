@@ -18,3 +18,5 @@ tuned model
 - sagemaker fits in by automating implementing machine learning models
     -> automating the infrastructure to make use of hardware with pre-built
        algorithms
+
+- Can change kernal properties using jupyter lab option in SageMaker's notebook instances
