@@ -19,4 +19,17 @@ tuned model
     -> automating the infrastructure to make use of hardware with pre-built
        algorithms
 
-- Can change kernal properties using jupyter lab option in SageMaker's notebook instances
+- Can change kernel properties using jupyter lab option in SageMaker's notebook instances
+
+** Containment Features **
+- determining endgram similarities
+    -> endgrams are occurances of word/words
+    -> if n=1, every word is counted separately
+    -> if n=2, every 2 words are counted
+    -> for the plagiarism problem, intersect endgrams of two different texts to
+       determine the similarities
+    -> containment equation = sum of intersected counts / full count
+
+** Longest Common Subsequence **
+- determine the longest pattern of common string occurances
+    -> take length of LCS and divide by total length
